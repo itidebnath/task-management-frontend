@@ -1,5 +1,5 @@
 import { useState } from "react"
-import axios from "axios"
+import api from "../api/axios"
 
 export default function Signup({ switchToLogin }) {
   const [name, setName] = useState("")
@@ -16,13 +16,14 @@ export default function Signup({ switchToLogin }) {
 
     try {
       setLoading(true)
-      const res = await axios.post("http://localhost:5000/api/auth/signup", {
+
+      const res = await api.post("/api/auth/signup", {
         name,
         email,
         password,
       })
 
-      setMessage(res.data.msg)
+      setMessage("Signup successful. Please login.")
       switchToLogin()
     } catch (err) {
       setMessage(err.response?.data?.msg || "Signup failed")

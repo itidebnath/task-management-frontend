@@ -1,21 +1,17 @@
 import { useEffect, useState } from "react"
-import axios from "axios"
+import api from "../api/axios"
 
 export default function UserDashboard({ onLogout }) {
   const [tasks, setTasks] = useState([])
   const [reasonTaskId, setReasonTaskId] = useState(null)
   const [reasonText, setReasonText] = useState("")
 
-  const token = localStorage.getItem("token")
-
   useEffect(() => {
     fetchTasks()
   }, [])
 
   const fetchTasks = async () => {
-    const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/tasks/mytasks`, {
-      headers: { Authorization: `Bearer ${token}` },
-    })
+    const res = await api.get("/api/tasks/mytasks")
     setTasks(res.data)
   }
 
@@ -25,23 +21,16 @@ export default function UserDashboard({ onLogout }) {
       return
     }
 
-    await axios.patch(
-      `${import.meta.env.VITE_API_URL}/api/tasks/${task._id}/toggle`,
-      {},
-      { headers: { Authorization: `Bearer ${token}` } }
-    )
-
+    await api.patch(`/api/tasks/${task._id}/toggle`)
     fetchTasks()
   }
 
   const submitReason = async (taskId) => {
     if (!reasonText.trim()) return
 
-    await axios.patch(
-      `${import.meta.env.VITE_API_URL}/api/tasks/${taskId}/toggle`,
-      { reason: reasonText },
-      { headers: { Authorization: `Bearer ${token}` } }
-    )
+    await api.patch(`/api/tasks/${taskId}/toggle`, {
+      reason: reasonText,
+    })
 
     setReasonTaskId(null)
     setReasonText("")

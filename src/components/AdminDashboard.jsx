@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react"
-import axios from "axios"
+import api from "../api/axios"
 
 export default function AdminDashboard({ onLogout }) {
   const [users, setUsers] = useState([])
@@ -7,35 +7,28 @@ export default function AdminDashboard({ onLogout }) {
   const [title, setTitle] = useState("")
   const [assignedTo, setAssignedTo] = useState("")
 
-  const token = localStorage.getItem("token")
-
   useEffect(() => {
     fetchUsers()
     fetchTasks()
   }, [])
 
   const fetchUsers = async () => {
-    const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/tasks/users`, {
-      headers: { Authorization: `Bearer ${token}` },
-    })
+    const res = await api.get("/api/tasks/users")
     setUsers(res.data)
   }
 
   const fetchTasks = async () => {
-    const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/tasks`, {
-      headers: { Authorization: `Bearer ${token}` },
-    })
+    const res = await api.get("/api/tasks")
     setTasks(res.data)
   }
 
   const createTask = async () => {
     if (!title || !assignedTo) return
 
-    await axios.post(
-      `${import.meta.env.VITE_API_URL}/api/tasks/create`,
-      { title, userId: assignedTo },
-      { headers: { Authorization: `Bearer ${token}` } }
-    )
+    await api.post("/api/tasks/create", {
+      title,
+      userId: assignedTo,
+    })
 
     setTitle("")
     setAssignedTo("")
@@ -43,9 +36,7 @@ export default function AdminDashboard({ onLogout }) {
   }
 
   const deleteTask = async (id) => {
-    await axios.delete(`${import.meta.env.VITE_API_URL}/api/tasks/${id}`, {
-      headers: { Authorization: `Bearer ${token}` },
-    })
+    await api.delete(`/api/tasks/${id}`)
     fetchTasks()
   }
 
@@ -120,7 +111,7 @@ export default function AdminDashboard({ onLogout }) {
               </div>
 
               <div className="flex items-center gap-4 mt-4 md:mt-0">
-                <span className={`text-sm font-semibold ${task.completed ? "text-green-400" : "text-red-400"}`}>
+                <span className={`text-sm font-semibold ${task.completed ? "text-green-400" : "text-amber-400"}`}>
                   {task.completed ? "Completed" : "Not Completed"}
                 </span>
 
