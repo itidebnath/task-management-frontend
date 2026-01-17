@@ -13,7 +13,7 @@ export default function UserDashboard({ onLogout }) {
   }, [])
 
   const fetchTasks = async () => {
-    const res = await axios.get("http://localhost:5000/api/tasks/mytasks", {
+    const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/tasks/mytasks`, {
       headers: { Authorization: `Bearer ${token}` },
     })
     setTasks(res.data)
@@ -26,7 +26,7 @@ export default function UserDashboard({ onLogout }) {
     }
 
     await axios.patch(
-      `http://localhost:5000/api/tasks/${task._id}/toggle`,
+      `${import.meta.env.VITE_API_URL}/api/tasks/${task._id}/toggle`,
       {},
       { headers: { Authorization: `Bearer ${token}` } }
     )
@@ -38,7 +38,7 @@ export default function UserDashboard({ onLogout }) {
     if (!reasonText.trim()) return
 
     await axios.patch(
-      `http://localhost:5000/api/tasks/${taskId}/toggle`,
+      `${import.meta.env.VITE_API_URL}/api/tasks/${taskId}/toggle`,
       { reason: reasonText },
       { headers: { Authorization: `Bearer ${token}` } }
     )

@@ -15,14 +15,14 @@ export default function AdminDashboard({ onLogout }) {
   }, [])
 
   const fetchUsers = async () => {
-    const res = await axios.get("http://localhost:5000/api/tasks/users", {
+    const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/tasks/users`, {
       headers: { Authorization: `Bearer ${token}` },
     })
     setUsers(res.data)
   }
 
   const fetchTasks = async () => {
-    const res = await axios.get("http://localhost:5000/api/tasks", {
+    const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/tasks`, {
       headers: { Authorization: `Bearer ${token}` },
     })
     setTasks(res.data)
@@ -32,7 +32,7 @@ export default function AdminDashboard({ onLogout }) {
     if (!title || !assignedTo) return
 
     await axios.post(
-      "http://localhost:5000/api/tasks/create",
+      `${import.meta.env.VITE_API_URL}/api/tasks/create`,
       { title, userId: assignedTo },
       { headers: { Authorization: `Bearer ${token}` } }
     )
@@ -43,7 +43,7 @@ export default function AdminDashboard({ onLogout }) {
   }
 
   const deleteTask = async (id) => {
-    await axios.delete(`http://localhost:5000/api/tasks/${id}`, {
+    await axios.delete(`${import.meta.env.VITE_API_URL}/api/tasks/${id}`, {
       headers: { Authorization: `Bearer ${token}` },
     })
     fetchTasks()
