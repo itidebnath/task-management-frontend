@@ -3,8 +3,7 @@ import api from "../api/axios"
 
 export default function UserDashboard({ onLogout }) {
   const [tasks, setTasks] = useState([])
-  const [activeTaskId, setActiveTaskId] = useState(null)
-  const [selectedStatus, setSelectedStatus] = useState("")
+  const [reasonTaskId, setReasonTaskId] = useState(null)
   const [reasonText, setReasonText] = useState("")
 
   useEffect(() => {
@@ -16,16 +15,14 @@ export default function UserDashboard({ onLogout }) {
     setTasks(res.data)
   }
 
-  // When user selects status
-  const handleStatusChange = async (task, status) => {
-    if (status === "completed") {
-      await api.patch(`/api/tasks/${task._id}/toggle`)
-      resetUI()
-      fetchTasks()
-    } else {
-      setActiveTaskId(task._id)
-      setSelectedStatus("not_completed")
+  const toggleComplete = async (task) => {
+    if (task.completed) {
+      setReasonTaskId(task._id)
+      return
     }
+
+    await api.patch(`/api/tasks/${task._id}/toggle`)
+    fetchTasks()
   }
 
   const submitReason = async (taskId) => {
@@ -35,14 +32,9 @@ export default function UserDashboard({ onLogout }) {
       reason: reasonText,
     })
 
-    resetUI()
-    fetchTasks()
-  }
-
-  const resetUI = () => {
-    setActiveTaskId(null)
-    setSelectedStatus("")
+    setReasonTaskId(null)
     setReasonText("")
+    fetchTasks()
   }
 
   return (
@@ -50,10 +42,10 @@ export default function UserDashboard({ onLogout }) {
       <div className="max-w-4xl mx-auto bg-white/10 backdrop-blur-xl border border-white/20 rounded-3xl p-8 shadow-2xl">
 
         <div className="flex justify-between items-center mb-8">
-          <h1 className="text-3xl font-bold">My Tasks</h1>
+          <h1 className="text-3xl font-bold">My Tasks 💫</h1>
           <button
             onClick={onLogout}
-            className="px-5 py-2 rounded-xl bg-pink-500 font-semibold"
+            className="px-5 py-2 rounded-xl bg-gradient-to-r from-pink-500 to-rose-500 text-slate-900 font-semibold hover:scale-105 transition"
           >
             Logout
           </button>
@@ -61,11 +53,13 @@ export default function UserDashboard({ onLogout }) {
 
         <div className="space-y-5">
           {tasks.map(task => (
-            <div key={task._id} className="bg-black/30 rounded-2xl p-5">
-
-              <div className="flex justify-between">
-                <p className="font-semibold">{task.title}</p>
-                <span className={task.completed ? "text-green-400" : "text-red-400"}>
+            <div
+              key={task._id}
+              className="bg-black/30 rounded-2xl p-5 hover:bg-black/40 transition"
+            >
+              <div className="flex justify-between items-center">
+                <p className="text-lg font-semibold">{task.title}</p>
+                <span className={`text-sm font-semibold ${task.completed ? "text-green-400" : "text-red-400"}`}>
                   {task.completed ? "Completed" : "Not Completed"}
                 </span>
               </div>
@@ -76,47 +70,31 @@ export default function UserDashboard({ onLogout }) {
                 </p>
               )}
 
-              {/* RADIO OPTIONS */}
-              <div className="mt-4 flex gap-6">
-                <label className="flex gap-2 items-center">
-                  <input
-                    type="radio"
-                    name={`status-${task._id}`}
-                    checked={task.completed}
-                    onChange={() => handleStatusChange(task, "completed")}
-                  />
-                  Completed
-                </label>
-
-                <label className="flex gap-2 items-center">
-                  <input
-                    type="radio"
-                    name={`status-${task._id}`}
-                    checked={!task.completed}
-                    onChange={() => handleStatusChange(task, "not_completed")}
-                  />
-                  Not Completed
-                </label>
+              <div className="mt-4 flex flex-wrap gap-3">
+                <button
+                  onClick={() => toggleComplete(task)}
+                  className="px-4 py-2 rounded-xl bg-gradient-to-r from-cyan-400 to-violet-500 text-slate-900 font-semibold hover:scale-105 transition"
+                >
+                  Toggle
+                </button>
               </div>
 
-              {/* REASON INPUT */}
-              {activeTaskId === task._id && selectedStatus === "not_completed" && (
+              {reasonTaskId === task._id && (
                 <div className="mt-4 flex gap-3">
                   <input
+                    placeholder="Enter reason"
                     value={reasonText}
                     onChange={(e) => setReasonText(e.target.value)}
-                    placeholder="Enter reason"
-                    className="flex-1 px-4 py-2 rounded-xl bg-black/40"
+                    className="flex-1 rounded-xl bg-black/40 px-4 py-2 outline-none focus:ring-2 focus:ring-pink-400"
                   />
                   <button
                     onClick={() => submitReason(task._id)}
-                    className="px-4 py-2 rounded-xl bg-cyan-500 font-semibold"
+                    className="px-4 py-2 rounded-xl bg-gradient-to-r from-cyan-500 to-fuchsia-500 text-slate-900 font-semibold hover:scale-105 transition"
                   >
                     Submit
                   </button>
                 </div>
               )}
-
             </div>
           ))}
         </div>
